@@ -1,0 +1,15 @@
+What is the diffusion rate for the luminal compounds?
+
+How does the toxin behave?  I.e., is it "used up" when damaging epi-cells?  Or does it decay away?
+
+Quantitative impact of toxin on epi-cells: how much does what damage?  This is an "internal" parameter that needs to be calibrated somehow.
+
+Epi-cells:  do they auto-restore health (as long as they are alive) irrespective of nutrient presence?
+
+Can patches ever be re-populated by epi-cells?  Basal replication rate is implied - do epi-cells follow similar life process as commensal microbes (replication if sufficiently healthy)?  What limits epi-cell growth?
+
+Commensal microbe replication/motility:  what happens to spawned microbes?  Can they stack?  Do both children occupy the same spot?  If so, do they ever diffuse (how)?  Or does one move into a nearby open patch?  (This is implied - "The commensal population spreads only by division/replication").  If so, what happens if nearby patches are occupied?
+
+How motile is C dif?  One patch per time step?
+
+What are relative metabolic rates for Cdif_veg vs. Cdif_spore vs. commensal?
