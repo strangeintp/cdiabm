@@ -4,10 +4,13 @@ Created on Nov 28, 2017
 @author: vince
 '''
 
+import Gut
 
 ''' Internal parameters'''
 replication_threshold = 100  # TBD
 movement_cost = 10 #TBD
+
+gut = None
 
 class Cell(object):
     '''
@@ -21,6 +24,8 @@ class Cell(object):
         '''
         self.energy = energy
         self.is_mobile = False   #Cdif_Veg overrides
+        if gut==None:
+            gut = Gut.gut
         
     def step(self):
         self.replicate()
