@@ -4,24 +4,27 @@ Created on Nov 29, 2017
 @author: vince
 '''
 
-import cells
+from cells import EpiCell
+from cells import Commensal
+from cells import Cdif_Spore
+from cells import Cdif_Veg
 from random import randint
 from random import shuffle
 
 '''Internal parameters'''
 grid_size = 31
-initial_energy = 100
-initial_nutrient = 100
+initial_energy = 0.5
+initial_nutrient = 0.2
 gut = None # a singleton object
 
 '''external parameters'''
-initial_commensal_count = 30
-initial_cdifspore_count = 10
-nutrient_rate = 100
+initial_commensal_count = 0
+initial_cdifspore_count = 0
+nutrient_rate = 1
 bile_rate = 100
 
 def modulus((x,y)):
-    return (x%grid_size, y%grid_size)
+    return ((x%grid_size, y%grid_size))
 
 class Gut(object):
     '''
@@ -50,25 +53,33 @@ class Gut(object):
                 patch.nutrients = initial_nutrient #TBD - what is initial amount?
                 self.positionOf[patch] = (x,y)
                 self.patchAt[x,y] = patch
-                epicell = EpiCell(initial_energy)
-                self.positionOf[epicell] = (x,y)
-                self.epicells.append(epicell)
+                cell = EpiCell(initial_energy)
+                self.spawn(cell, (x,y))
         
         ''' Initialize commensals '''
         for i in range(initial_commensal_count):
             cell = Commensal(initial_energy)
             x = randint(0, grid_size-1)
             y = randint(0, grid_size-1)
-            self.positionOf[cell] = (x,y)
-            self.commensals.append(cell)
+            self.spawn(cell, (x,y))
         
         '''Initialize C dif spores'''
         for i in range(initial_cdifspore_count):
             spore = Cdif_Spore(initial_energy)
             x = randint(0, grid_size-1)
             y = randint(0, grid_size-1)
-            self.positionOf[spore] = (x,y)
-            self.cdif_spores.append(spore)
+            self.spawn(spore, (x,y))
+    
+    def spawn(self, cell, position):
+        self.positionOf[cell] = position
+        if isinstance(cell, EpiCell):
+            self.epicells.append(cell)
+        elif isinstance(cell, Commensal):
+            self.commensals.append(cell)
+        elif isinstance(cell, Cdif_Spore):
+            self.cdif_spores.append(cell)
+        elif isinstance(cell, Cdif_Veg):
+            self.cdif_vegs.append(cell)
         
     def step(self):
         things = list(self.positionOf.keys())
@@ -117,7 +128,7 @@ class Gut(object):
 class Patch(object):
     
     def __init__(self):
-        self.nutrient = 0
+        self.nutrient = initial_nutrient
         self.TCA = 0
         self.DCA = 0
         self.toxin = 0
@@ -146,7 +157,5 @@ class Patch(object):
             patch.DCA += DCA
             patch.toxin += toxin
         
-        
-        
-        
+
         
