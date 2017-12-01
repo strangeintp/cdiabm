@@ -25,11 +25,9 @@ cmap = matplotlib.colors.LinearSegmentedColormap(name='G', segmentdata=cdict, N=
 
 dirNames = []
 
-gut = None
-
 def init():
-    global envir, time, gut
-    gut = Gut.Gut()
+    global envir, time
+    Gut.Gut()
     time = 0
     
     envir = SP.zeros([grid_size, grid_size])
@@ -63,36 +61,36 @@ def draw():
     PL.axis('image')
     PL.hold(True)
     '''Plot Epicells'''
-    cells = gut.epicells
+    cells = Gut.gut.epicells
     if cells:
-        xyp = zip(*[gut.positionOf[cell] for cell in cells])
+        xyp = zip(*[Gut.gut.positionOf[cell] for cell in cells])
         jitter = 0.2
         x = [(0.5 + random()*jitter - jitter/2 + xp) for xp in list(xyp[0])]
         y = [(0.5 + random()*jitter - jitter/2 + yp) for yp in list(xyp[1])]
         s = [50 for cell in cells]
         PL.scatter(x, y, c = s, s=75, cmap = PL.cm.RdPu, vmin = 0, vmax = 100)
     '''Plot Commensals'''
-    cells = gut.commensals
+    cells = Gut.gut.commensals
     if cells:
-        xyp = zip(*[gut.positionOf[cell] for cell in cells])
+        xyp = zip(*[Gut.gut.positionOf[cell] for cell in cells])
         jitter = 0.4
         x = [(0.5 + random()*jitter - jitter/2 + xp) for xp in list(xyp[0])]
         y = [(0.5 + random()*jitter - jitter/2 + yp) for yp in list(xyp[1])]
         s = [50 for cell in cells]
         PL.scatter(x, y, c = s, s=30, cmap = PL.cm.Blues, vmin = 0, vmax = 100)
     '''Plot Cdif spores'''
-    cells = gut.cdif_spores
+    cells = Gut.gut.cdif_spores
     if cells:
-        xyp = zip(*[gut.positionOf[cell] for cell in cells])
+        xyp = zip(*[Gut.gut.positionOf[cell] for cell in cells])
         jitter = 0.4
         x = [(0.5 + random()*jitter - jitter/2 + xp) for xp in list(xyp[0])]
         y = [(0.5 + random()*jitter - jitter/2 + yp) for yp in list(xyp[1])]
         s = [0 for cell in cells]
         PL.scatter(x, y, c = s, s=30, cmap = PL.cm.binary, vmin = 0, vmax = 100)
     '''Plot Cdif vegs'''
-    cells = gut.cdif_vegs
+    cells = Gut.gut.cdif_vegs
     if cells:
-        xyp = zip(*[gut.positionOf[cell] for cell in cells])
+        xyp = zip(*[Gut.gut.positionOf[cell] for cell in cells])
         jitter = 0.4
         x = [(0.5 + random()*jitter - jitter/2 + xp) for xp in list(xyp[0])]
         y = [(0.5 + random()*jitter - jitter/2 + yp) for yp in list(xyp[1])]
@@ -104,7 +102,7 @@ def draw():
 def step():
     global time
     time += 1
-    gut.step()
+    Gut.gut.step()
 
 def run():
     import pycxsimulator

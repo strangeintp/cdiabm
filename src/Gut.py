@@ -15,10 +15,9 @@ from random import shuffle
 grid_size = 31
 initial_energy = 0.5
 initial_nutrient = 0.2
-gut = None # a singleton object
 
 '''external parameters'''
-initial_commensal_count = 0
+initial_commensal_count = 200
 initial_cdifspore_count = 0
 nutrient_rate = 1
 bile_rate = 100
@@ -26,11 +25,12 @@ bile_rate = 100
 def modulus((x,y)):
     return ((x%grid_size, y%grid_size))
 
+gut = None
+
 class Gut(object):
     '''
     classdocs
     '''
-
 
     def __init__(self):
         '''
@@ -50,7 +50,7 @@ class Gut(object):
         for x in range(grid_size):
             for y in range(grid_size):
                 patch = Patch()
-                patch.nutrients = initial_nutrient #TBD - what is initial amount?
+                patch.nutrient = initial_nutrient #TBD - what is initial amount?
                 self.positionOf[patch] = (x,y)
                 self.patchAt[x,y] = patch
                 cell = EpiCell(initial_energy)
@@ -70,8 +70,11 @@ class Gut(object):
             y = randint(0, grid_size-1)
             self.spawn(spore, (x,y))
     
-    def spawn(self, cell, position):
-        self.positionOf[cell] = position
+    def spawn(self, cell, (x,y), neighbors=False):
+        if neighbors:
+            x += randint(-1,1)
+            y += randint(-1,1)
+        self.positionOf[cell] = modulus((x,y))
         if isinstance(cell, EpiCell):
             self.epicells.append(cell)
         elif isinstance(cell, Commensal):
@@ -111,8 +114,8 @@ class Gut(object):
     
     def getCompoundsAt(self, position):
         patch = self.patchAt[position]
-        compounds = (patch.nutrients, patch.TCA, patch.DCA, patch.toxin)
-        patch.nutrients = 0
+        compounds = (patch.nutrient, patch.TCA, patch.DCA, patch.toxin)
+        patch.nutrient = 0
         patch.TCA = 0
         patch.DCA = 0
         patch.toxin = 0
