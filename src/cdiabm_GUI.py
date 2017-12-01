@@ -67,7 +67,7 @@ def draw():
         jitter = 0.2
         x = [(0.5 + random()*jitter - jitter/2 + xp) for xp in list(xyp[0])]
         y = [(0.5 + random()*jitter - jitter/2 + yp) for yp in list(xyp[1])]
-        s = [50 for cell in cells]
+        s = [100*cell.energy for cell in cells]
         PL.scatter(x, y, c = s, s=75, cmap = PL.cm.RdPu, vmin = 0, vmax = 100)
     '''Plot Commensals'''
     cells = Gut.gut.commensals
@@ -90,12 +90,13 @@ def draw():
     '''Plot Cdif vegs'''
     cells = Gut.gut.cdif_vegs
     if cells:
+        print("Number of germs:" + str(len(cells)))
         xyp = zip(*[Gut.gut.positionOf[cell] for cell in cells])
         jitter = 0.4
         x = [(0.5 + random()*jitter - jitter/2 + xp) for xp in list(xyp[0])]
         y = [(0.5 + random()*jitter - jitter/2 + yp) for yp in list(xyp[1])]
-        s = [1 for cell in cells]
-        PL.scatter(x, y, c = s, s=30, cmap = PL.cm.binary, vmin = 0, vmax = 100)
+        s = [50 for cell in cells]
+        PL.scatter(x, y, c = s, s=30, cmap = PL.cm.Greens, vmin = 0, vmax = 100)
     PL.hold(False)
     PL.title('t = ' + str(time))
     

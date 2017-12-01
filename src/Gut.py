@@ -17,10 +17,10 @@ initial_energy = 0.5
 initial_nutrient = 0.2
 
 '''external parameters'''
-initial_commensal_count = 200
-initial_cdifspore_count = 0
-nutrient_rate = 1
-bile_rate = 100
+initial_commensal_count = (3*grid_size*grid_size)//100
+initial_cdifspore_count = 20
+nutrient_rate = 3
+bile_rate = 0.01
 
 def modulus((x,y)):
     return ((x%grid_size, y%grid_size))
