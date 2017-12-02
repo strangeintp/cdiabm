@@ -136,7 +136,7 @@ class Cdif_Spore(Cell):
         return (nutrient, TCA, DCA, toxin)
     
     def replicate(self):
-        if self.TCA > cdif_germinate_threshold and self.energy > cdif_sporulate_threshold:
+        if self.TCA > cdif_germinate_threshold:# and self.energy > cdif_sporulate_threshold:
             spawn = Cdif_Veg(self.energy)
             Gut.gut.spawn(spawn, Gut.gut.positionOf[self], neighbors=False)
             self.energy = -10
