@@ -8,10 +8,8 @@ from random import random
 import Gut
 
 ''' Internal parameters'''
-replication_threshold = 1.2  # TBD
-movement_cost = 0.5 #TBD
-cdif_toxin_rate = 5
-death_nutrients = 0
+replication_threshold = 1.2
+movement_cost = 0.4 #TBD
 cdif_sporulate_threshold = 0.05
 cdif_sporulate_chance = 0.15
 cdif_germinate_threshold = 0.05
@@ -51,7 +49,8 @@ class Cell(object):
         if self.is_mobile:
             current_position = Gut.gut.positionOf[self]
             patches = Gut.gut.getNeighborhood(current_position)
-            destination = max(patches, key=lambda patch: patch.nutrient)
+            d = lambda patch:movement_cost if Gut.gut.positionOf[patch]!=current_position else 0
+            destination = max(patches, key=lambda patch: patch.nutrient-d(patch))
             if Gut.gut.positionOf[destination] != current_position:
                 Gut.gut.changePatch(self, destination)
                 self.energy -= movement_cost
@@ -63,8 +62,6 @@ class Cell(object):
         self.energy -= self.basal_metabolic_cost
     
     def checkHealth(self):
-        '''
-        '''
         if self.energy < 0:
             Gut.gut.removeAgent(self)
     
@@ -89,16 +86,18 @@ class EpiCell(Cell):
     def checkHealth(self):
         if self.energy < (1-0.02):
             self.energy += 0.02
+        if self.energy > 1.0:
+            self.energy = 1
     
     def replicate(self):
         pass
     
     def processCompounds(self, nutrient, TCA, DCA, toxin):
-        consumption = 0
-        self.energy += consumption
-        nutrient -= consumption
         self.energy -= toxin
+        nutrient += toxin
         toxin = 0
+        if self.energy <0:
+            self.energy = 0
         return (nutrient, TCA, DCA, toxin)
 
 
@@ -112,7 +111,7 @@ class Commensal(Cell):
         consumption = min(nutrient, 1)
         self.energy += consumption
         nutrient -= consumption
-        TCAconsumed = min(TCA, 5*cdif_germinate_threshold)
+        TCAconsumed = random()*TCA
         DCA += TCAconsumed
         TCA -= TCAconsumed
         return (nutrient, TCA, DCA, toxin)
@@ -120,24 +119,24 @@ class Commensal(Cell):
 
 class Cdif_Spore(Cell):  
     
-    basal_metabolic_cost = 0.5
+    basal_metabolic_cost = 0.1
     
     def __init__(self, energy):
         super(Cdif_Spore, self).__init__(energy)
-        self.TCA = 0
+        self.TCA = random()*cdif_germinate_threshold
     
     def processCompounds(self, nutrient, TCA, DCA, toxin):
-        consumption = min(nutrient, 1)
-        self.energy += consumption
-        nutrient -= consumption
-        TCAconsumed = min(TCA, cdif_germinate_threshold)
+        if self.energy < self.basal_metabolic_cost:
+            consumption = min(nutrient, self.basal_metabolic_cost)
+            self.energy += consumption
+            nutrient -= consumption
+        TCAconsumed = random()*TCA
         self.TCA += TCAconsumed
         TCA -= TCAconsumed
         return (nutrient, TCA, DCA, toxin)
     
     def replicate(self):
-        if self.energy > replication_threshold and self.TCA > cdif_germinate_threshold:
-            #TBD is there energy expenditure in replication?
+        if self.TCA > cdif_germinate_threshold and self.energy > cdif_sporulate_threshold:
             spawn = Cdif_Veg(self.energy)
             Gut.gut.spawn(spawn, Gut.gut.positionOf[self], neighbors=False)
             self.energy = -10
@@ -153,16 +152,13 @@ class Cdif_Veg(Cell):
         self.DCA = 0
     
     def checkHealth(self):
-        if self.energy < cdif_sporulate_threshold:
+        if self.energy < cdif_sporulate_threshold and self.energy>0:
             if random() < cdif_sporulate_chance:
                 self.sporulate()
-            elif self.energy < 0:
-                pos = Gut.gut.positionOf[self]
-                Gut.gut.putCompounds(pos, death_nutrients, 0, 0, 0)
-                Gut.gut.removeAgent(self)
-        elif self.DCA > cdif_sporulate_threshold:
-            spore = Cdif_Spore(self.energy)
-            Gut.gut.spawn(spore, Gut.gut.positionOf[self], neighbors=False)
+        elif self.DCA > cdif_sporulate_threshold and self.energy>0:
+            self.sporulate()
+        if self.energy < 0:
+            pos = Gut.gut.positionOf[self]
             Gut.gut.removeAgent(self)
             
             
@@ -170,7 +166,7 @@ class Cdif_Veg(Cell):
         consumption = min(nutrient, 1)
         self.energy += consumption
         nutrient -= consumption
-        DCAconsumed = min(DCA, cdif_sporulate_threshold)
+        DCAconsumed = random()*DCA
         self.DCA += DCAconsumed
         DCA -= DCAconsumed
         toxin += toxin_production
